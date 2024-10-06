@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
@@ -30,51 +31,48 @@ public class CarsRepositoryFileBasedImpl implements CarsRepository{
                     .filter(c -> c.getColor().equals("Black") || c.getMileage() == 0)
                     .map(Car::getNumber)
                     .collect(Collectors.toList());
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (FileNotFoundException d) {
+            throw new RuntimeException(d);
         }
     }
 
     @Override
     public int getDistinctCarMiddleCost() {
-        try {
-            return (int) new BufferedReader(new FileReader(filename))
-                    .lines()
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))){
+            return (int) reader.lines()
                     .map(stringToCarMapper)
                     .distinct()
                     .filter(c -> c.getCost() <= 800 && c.getCost() >= 700)
                     .count();
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public String getColorCarWithMinCost() {
-        try {
-            return new BufferedReader(new FileReader(filename))
-                    .lines()
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))){
+            return reader.lines()
                     .map(stringToCarMapper)
                     .distinct()
                     .min(Comparator.comparing(Car::getCost))
                     .map(Car::getColor)
                     .get();
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public double getAverageCamry() {
-        try {
-            return new BufferedReader(new FileReader(filename))
-                    .lines()
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))){
+            return reader.lines()
                     .map(stringToCarMapper)
                     .distinct()
                     .mapToDouble(Car::getCost)
                     .average()
                     .getAsDouble();
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
